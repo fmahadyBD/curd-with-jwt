@@ -15,4 +15,6 @@ public interface IMyUserService {
                        id);
     void delete(Long id);
     MyUserDto getConvertedMyUser(MyUser myUser);
+
+    List<MyUserDto> usersConvertedToDto(List<MyUser> user);
 }

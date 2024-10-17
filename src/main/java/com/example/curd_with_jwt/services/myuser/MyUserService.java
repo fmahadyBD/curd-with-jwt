@@ -32,12 +32,12 @@ public class MyUserService implements IMyUserService {
 
     @Override
     public List<MyUser> getAllUser() {
-        return List.of();
+        return myUserRepository.findAll();
     }
 
     @Override
     public MyUser findUserById(Long id) {
-        return null;
+        return myUserRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
     @Override
@@ -57,7 +57,9 @@ public class MyUserService implements IMyUserService {
 
     @Override
     public void delete(Long id) {
-
+        myUserRepository.findById(id).ifPresentOrElse(myUserRepository::delete, () -> {
+            throw new ResourceNotFoundException("User not found");
+        });
     }
 
     @Override
@@ -68,5 +70,12 @@ public class MyUserService implements IMyUserService {
                 myUser.getRole()
 
         );
+
+
+    }
+
+    @Override
+    public List<MyUserDto> usersConvertedToDto(List<MyUser> user) {
+        return user.stream().map(this::getConvertedMyUser).toList();
     }
 }

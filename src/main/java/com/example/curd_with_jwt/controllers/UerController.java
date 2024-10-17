@@ -11,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @AllArgsConstructor
 @RestController
@@ -19,6 +22,29 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public class UerController {
 
     private final IMyUserService myUserService;
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse> getAllUser(){
+        try{
+           List<MyUser> users =myUserService.getAllUser();
+           List<MyUserDto> convertedUserDto = myUserService.usersConvertedToDto(users);
+           return ResponseEntity.ok().body(new ApiResponse("All user",convertedUserDto));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(),null));
+        }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ApiResponse> getUser(@PathVariable Long id){
+        try{
+            MyUser myUser = myUserService.findUserById(id);
+            MyUserDto myUserDto = myUserService.getConvertedMyUser(myUser);
+            return ResponseEntity.ok().body(new ApiResponse("Found!",myUserDto));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Not found",e.getMessage()));
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addNewUser(@Validated @RequestBody MyUserRequest request) {
@@ -34,6 +60,7 @@ public class UerController {
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse> updateUser(@Validated @RequestBody UpdateMyUserRequest request, @PathVariable Long id) {
         try {
+
             MyUser myUser = myUserService.updateUser(request, id);
             MyUserDto dto = myUserService.getConvertedMyUser(myUser);
             return ResponseEntity.ok().body(new ApiResponse("Successfully update", dto));
@@ -41,6 +68,15 @@ public class UerController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Error on update", e.getMessage()));
         }
 
+    }
+    @DeleteMapping("/delete/{id}/delete")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long id){
+        try{
+            myUserService.delete(id);
+            return ResponseEntity.ok().body(new ApiResponse("Successfully delete user",id));
+        } catch (Exception e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(),null));
+        }
     }
 
 }

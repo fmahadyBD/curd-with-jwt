@@ -21,7 +21,5 @@ public class UpdateMyUserRequest {
     @NotBlank(message = "Password can not be empty")
     @Size(min = 8, message = "Password must be at least 8 character long. ")
     private String password;
-
-    @NotBlank(message = "Role must be provided")
     private UserRole role;
 }
