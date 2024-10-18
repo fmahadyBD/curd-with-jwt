@@ -7,6 +7,8 @@ import com.example.curd_with_jwt.reposioty.MyUserRepository;
 import com.example.curd_with_jwt.request.MyUserRequest;
 import com.example.curd_with_jwt.request.UpdateMyUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +18,12 @@ import java.util.List;
 public class MyUserService implements IMyUserService {
 
     private final MyUserRepository myUserRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Override
     public MyUser addNewUser(MyUserRequest request) {
+
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         return myUserRepository.save(createMyUser(request));
     }
 
